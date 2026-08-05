@@ -1,0 +1,58 @@
+{
+    "UnskinnedVertex": {
+        "type": "vertex",
+        "file": "shaders/flutter_scene_unskinned.vert"
+    },
+    "SkinnedVertex": {
+        "type": "vertex",
+        "file": "shaders/flutter_scene_skinned.vert"
+    },
+    "UnlitFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_unlit.frag"
+    },
+    "StandardFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_standard.frag"
+    },
+    "DepthOnlyFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_depth_only.frag"
+    },
+    "LinearDepthFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_linear_depth.frag"
+    },
+    "SsaoFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_ssao.frag"
+    },
+    "SsaoBlurFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_ssao_blur.frag"
+    },
+    "FullscreenVertex": {
+        "type": "vertex",
+        "file": "shaders/flutter_scene_fullscreen.vert"
+    },
+    "ResolveFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_resolve.frag"
+    },
+    "PrefilterEnvFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_prefilter_env.frag"
+    },
+    "BloomThresholdFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_bloom_threshold.frag"
+    },
+    "BloomDownsampleFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_bloom_downsample.frag"
+    },
+    "BloomUpsampleFragment": {
+        "type": "fragment",
+        "file": "shaders/flutter_scene_bloom_upsample.frag"
+    }
+}

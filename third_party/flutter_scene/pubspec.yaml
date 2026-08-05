@@ -1,0 +1,62 @@
+name: flutter_scene
+description: A general-purpose realtime 3D rendering library for Flutter.
+version: 0.16.0
+repository: https://github.com/bdero/flutter_scene
+homepage: https://github.com/bdero/flutter_scene
+platforms:
+  macos:
+  ios:
+  android:
+  windows:
+  linux:
+  web:
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.29.0-1.0.pre.242"
+
+dependencies:
+  # Offline glTF -> .model import (build hook + CLI): arg parsing and image
+  # decoding. Build/offline-time only; tree-shaken from runtime builds.
+  args: ^2.5.0
+  collection: ^1.19.0
+  data_assets: ^0.20.0
+  # Reader for the bundled GPU shim's shader-bundle flatbuffer. The importer's
+  # own glTF flatbuffers use a separate vendored copy under
+  # src/importer/third_party.
+  flat_buffers: ^25.9.23
+  flutter:
+    sdk: flutter
+  # Native-only: the bundled GPU shim re-exports flutter_gpu on native and
+  # falls back to a WebGL2 backend on web.
+  flutter_gpu:
+    sdk: flutter
+  # 0.4.5 includes the DataAssets shader-bundle mode used by the new
+  # zero-manifest .fmat workflow.
+  # MAGNET RUSH LOCAL PATCH: 0.5.1 is the first release whose
+  # buildShaderBundleJson accepts glesLanguageVersion, which hook/build.dart
+  # needs to emit a GLES-ES-3.00-safe shader bundle. See third_party/README.md.
+  flutter_gpu_shaders: ^0.5.1
+  hooks: ^2.0.0
+  image: ^4.5.0
+  logging: ^1.2.0
+  vector_math: ^2.1.4
+  # WebGL2 bindings for the web GPU backend.
+  web: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  test: ^1.25.15
+
+flutter:
+  assets:
+    - build/shaderbundles/base.shaderbundle
+    # Split-sum DFG lookup for specular IBL.
+    - assets/ibl_brdf_lut.png
+    # A bundled sample environment, loadable via EnvironmentMap.fromAssets.
+    # (The zero-config default is the procedural EnvironmentMap.studio().)
+    - assets/royal_esplanade.png

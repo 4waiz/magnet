@@ -1,0 +1,146 @@
+import 'dart:ui' as ui;
+
+import 'package:flutter_scene/src/gpu/gpu.dart' as gpu;
+import 'package:vector_math/vector_math.dart';
+
+import 'package:flutter_scene/src/camera.dart';
+import 'package:flutter_scene/src/light.dart';
+import 'package:flutter_scene/src/material/environment.dart';
+import 'package:flutter_scene/src/render/render_graph.dart';
+import 'package:flutter_scene/src/render/render_scene.dart';
+import 'package:flutter_scene/src/render/shadow_pass.dart';
+import 'package:flutter_scene/src/render/ssao_pass.dart';
+import 'package:flutter_scene/src/scene_encoder.dart';
+
+/// Render-graph blackboard key for the current scene-color texture.
+///
+/// [ScenePass] publishes the linear HDR scene color here. Post-processing
+/// passes read it and republish their own output, so the resolve pass
+/// reads whatever the last pass produced.
+const String kSceneColorBlackboardKey = 'scene_color';
+
+/// Draws the scene's render items (opaque, then depth-sorted
+/// translucent) into a floating-point HDR color target, publishing it on
+/// the render-graph blackboard for the resolve pass to read. If a
+/// [ShadowPass] ran earlier this frame its shadow map is picked up from
+/// the blackboard and threaded into the per-draw [Lighting].
+class ScenePass extends RenderGraphPass {
+  ScenePass({
+    required Camera camera,
+    required RenderScene renderScene,
+    required ui.Size dimensions,
+    required EnvironmentMap environmentMap,
+    required double environmentIntensity,
+    Matrix3? environmentTransform,
+    required bool enableMsaa,
+    DirectionalLight? directionalLight,
+    List<ShadowCascade> cascades = const [],
+    double specularOcclusionMode = 0.0,
+  }) : _camera = camera,
+       _renderScene = renderScene,
+       _dimensions = dimensions,
+       _environmentMap = environmentMap,
+       _environmentIntensity = environmentIntensity,
+       _environmentTransform = environmentTransform,
+       _enableMsaa = enableMsaa,
+       _directionalLight = directionalLight,
+       _cascades = cascades,
+       _specularOcclusionMode = specularOcclusionMode;
+
+  final Camera _camera;
+  final RenderScene _renderScene;
+  final ui.Size _dimensions;
+  final EnvironmentMap _environmentMap;
+  final double _environmentIntensity;
+  final Matrix3? _environmentTransform;
+  final bool _enableMsaa;
+  final DirectionalLight? _directionalLight;
+  final List<ShadowCascade> _cascades;
+  final double _specularOcclusionMode;
+
+  static const gpu.PixelFormat _hdrFormat = gpu.PixelFormat.r16g16b16a16Float;
+
+  @override
+  String get name => 'ScenePass';
+
+  @override
+  void execute(RenderGraphContext context) {
+    final width = _dimensions.width.toInt();
+    final height = _dimensions.height.toInt();
+
+    final hdrColor = context.texturePool.acquire(
+      TransientTextureDescriptor.color(
+        width: width,
+        height: height,
+        format: _hdrFormat,
+        debugName: 'hdr_scene_color',
+      ),
+    );
+    final depth = context.texturePool.acquire(
+      TransientTextureDescriptor.depth(
+        width: width,
+        height: height,
+        format: gpu.gpuContext.defaultDepthStencilFormat,
+        sampleCount: _enableMsaa ? 4 : 1,
+        debugName: 'scene_depth',
+      ),
+    );
+    final colorAttachment = gpu.ColorAttachment(texture: hdrColor);
+    if (_enableMsaa) {
+      final msaaColor = context.texturePool.acquire(
+        TransientTextureDescriptor(
+          width: width,
+          height: height,
+          format: _hdrFormat,
+          sampleCount: 4,
+          storageMode: gpu.StorageMode.deviceTransient,
+          enableShaderReadUsage: false,
+          debugName: 'hdr_scene_color_msaa',
+        ),
+      );
+      colorAttachment.texture = msaaColor;
+      colorAttachment.resolveTexture = hdrColor;
+      colorAttachment.storeAction = gpu.StoreAction.multisampleResolve;
+    }
+    final target = gpu.RenderTarget.singleColor(
+      colorAttachment,
+      depthStencilAttachment: gpu.DepthStencilAttachment(
+        texture: depth,
+        depthClearValue: 1.0,
+      ),
+    );
+
+    final shadowMap = context.blackboard.get<gpu.Texture>(
+      kShadowMapBlackboardKey,
+    );
+    final ssaoMap = context.blackboard.get<gpu.Texture>(
+      kSsaoTextureBlackboardKey,
+    );
+    final lighting = Lighting(
+      environmentMap: _environmentMap,
+      environmentIntensity: _environmentIntensity,
+      environmentTransform: _environmentTransform,
+      directionalLight: _directionalLight,
+      shadowMap: shadowMap,
+      cascades: shadowMap == null ? const [] : _cascades,
+      ssaoMap: ssaoMap,
+      specularOcclusionMode: ssaoMap == null ? 0.0 : _specularOcclusionMode,
+      viewportSize: _dimensions,
+    );
+
+    final commandBuffer = gpu.gpuContext.createCommandBuffer();
+    final renderPass = commandBuffer.createRenderPass(target);
+    final encoder = SceneEncoder(
+      renderPass,
+      context.transientsBuffer,
+      _camera,
+      _dimensions,
+      lighting,
+    );
+    _renderScene.cull(encoder.frustum, encoder.submit);
+    encoder.flush();
+    commandBuffer.submit();
+
+    context.blackboard.set(kSceneColorBlackboardKey, hdrColor);
+  }
+}

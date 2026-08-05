@@ -109,19 +109,41 @@ class MeshTemplate {
   static MeshTemplate icosphere(double radius, int subdivisions) {
     final t = (1.0 + math.sqrt(5.0)) / 2.0;
     var verts = <Vector3>[
-      Vector3(-1, t, 0), Vector3(1, t, 0), Vector3(-1, -t, 0),
+      Vector3(-1, t, 0),
+      Vector3(1, t, 0),
+      Vector3(-1, -t, 0),
       Vector3(1, -t, 0),
-      Vector3(0, -1, t), Vector3(0, 1, t), Vector3(0, -1, -t),
+      Vector3(0, -1, t),
+      Vector3(0, 1, t),
+      Vector3(0, -1, -t),
       Vector3(0, 1, -t),
-      Vector3(t, 0, -1), Vector3(t, 0, 1), Vector3(-t, 0, -1),
+      Vector3(t, 0, -1),
+      Vector3(t, 0, 1),
+      Vector3(-t, 0, -1),
       Vector3(-t, 0, 1),
     ].map((v) => v.normalized()).toList();
 
     var faces = <List<int>>[
-      [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
-      [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
-      [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
-      [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1],
+      [0, 11, 5],
+      [0, 5, 1],
+      [0, 1, 7],
+      [0, 7, 10],
+      [0, 10, 11],
+      [1, 5, 9],
+      [5, 11, 4],
+      [11, 10, 2],
+      [10, 7, 6],
+      [7, 1, 8],
+      [3, 9, 4],
+      [3, 4, 2],
+      [3, 2, 6],
+      [3, 6, 8],
+      [3, 8, 9],
+      [4, 9, 5],
+      [2, 4, 11],
+      [6, 2, 10],
+      [8, 6, 7],
+      [9, 8, 1],
     ];
 
     for (var s = 0; s < subdivisions; s++) {
@@ -163,9 +185,15 @@ class MeshTemplate {
       final c = verts[faces[i][2]] * radius;
       final n = (b - a).cross(c - a).normalized();
       final o = i * 9;
-      pos[o] = a.x; pos[o + 1] = a.y; pos[o + 2] = a.z;
-      pos[o + 3] = b.x; pos[o + 4] = b.y; pos[o + 5] = b.z;
-      pos[o + 6] = c.x; pos[o + 7] = c.y; pos[o + 8] = c.z;
+      pos[o] = a.x;
+      pos[o + 1] = a.y;
+      pos[o + 2] = a.z;
+      pos[o + 3] = b.x;
+      pos[o + 4] = b.y;
+      pos[o + 5] = b.z;
+      pos[o + 6] = c.x;
+      pos[o + 7] = c.y;
+      pos[o + 8] = c.z;
       for (var k = 0; k < 3; k++) {
         nrm[o + k * 3] = n.x;
         nrm[o + k * 3 + 1] = n.y;
@@ -397,7 +425,8 @@ class _SmokeTestPageState extends State<SmokeTestPage>
 
   final Scene _scene = Scene();
   late final MeshBatcher _batcher;
-  late final Node _coreNode;
+  late Node _coreNode;
+  bool _usingGlb = false;
   late final PhysicallyBasedMaterial _metalMaterial;
 
   final List<MetalPiece> _pieces = [];
@@ -470,11 +499,26 @@ class _SmokeTestPageState extends State<SmokeTestPage>
     _scene.exposure = 1.15;
 
     _ticker = createTicker(_onFrame)..start();
-    Scene.initializeStaticResources().then((_) {
-      if (mounted) setState(() => _ready = true);
-    });
+    _boot();
 
     SchedulerBinding.instance.addTimingsCallback(_onTimings);
+  }
+
+  /// Boots the renderer, then swaps the procedural placeholder Core for the
+  /// Blender-authored GLB. This is the end-to-end proof of the asset pipeline:
+  /// art/blender/build_assets.py -> assets/models -> on-device geometry.
+  Future<void> _boot() async {
+    await Scene.initializeStaticResources();
+    try {
+      final glb = await Node.fromGlbAsset('assets/models/core/kanban_core.glb');
+      _scene.remove(_coreNode);
+      _coreNode = glb;
+      _scene.add(_coreNode);
+      _usingGlb = true;
+    } catch (e) {
+      debugPrint('Kanban Core GLB failed to load; keeping placeholder: $e');
+    }
+    if (mounted) setState(() => _ready = true);
   }
 
   void _onFrame(Duration elapsed) {
@@ -508,7 +552,8 @@ class _SmokeTestPageState extends State<SmokeTestPage>
     if (_frameMs.length > 30) {
       final sorted = List<double>.from(_frameMs)..sort();
       _avgMs = _frameMs.reduce((a, b) => a + b) / _frameMs.length;
-      _p95Ms = sorted[(sorted.length * 0.95).floor().clamp(0, sorted.length - 1)];
+      _p95Ms =
+          sorted[(sorted.length * 0.95).floor().clamp(0, sorted.length - 1)];
     }
   }
 
@@ -715,9 +760,7 @@ class _SmokeTestPageState extends State<SmokeTestPage>
       _batcher.add(
         b.template,
         b.transform(),
-        b.alive
-            ? Vector4(0.55, 0.60, 0.68, 1)
-            : Vector4(0.95, 0.55, 0.25, 1),
+        b.alive ? Vector4(0.55, 0.60, 0.68, 1) : Vector4(0.95, 0.55, 0.25, 1),
       );
     }
     _batcher.flush(_scene, _metalMaterial);
@@ -778,42 +821,54 @@ class _SmokeTestPageState extends State<SmokeTestPage>
               child: ListenableBuilder(
                 listenable: _repaint,
                 builder: (context, _) => DefaultTextStyle(
-                style: const TextStyle(
-                  color: Color(0xFF8FE9FF),
-                  fontSize: 12,
-                  fontFamily: 'monospace',
-                  height: 1.5,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'MAGNET RUSH — RENDERER SMOKE TEST',
-                      style: TextStyle(
-                        color: Color(0xFFFFFFFF),
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
+                  style: const TextStyle(
+                    color: Color(0xFF8FE9FF),
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    height: 1.5,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'MAGNET RUSH — RENDERER SMOKE TEST',
+                        style: TextStyle(
+                          color: Color(0xFFFFFFFF),
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text('orbiting   $_orbiting / $kMaxSwarm'),
-                    Text('collected  $_collected'),
-                    Text('destroyed  $_destroyed'),
-                    Text('batch tris ${_batcher.triangleCount}'),
-                    Text('batch vtx  ${_batcher.vertexCount}'),
-                    const SizedBox(height: 6),
-                    Text(
-                      'frame avg  ${_avgMs.toStringAsFixed(2)} ms',
-                      style: TextStyle(
-                        color: _avgMs < 17 ? m.Colors.greenAccent : m.Colors.orangeAccent,
-                        fontSize: 12,
-                        fontFamily: 'monospace',
+                      Text('orbiting   $_orbiting / $kMaxSwarm'),
+                      Text('collected  $_collected'),
+                      Text('destroyed  $_destroyed'),
+                      Text('batch tris ${_batcher.triangleCount}'),
+                      Text('batch vtx  ${_batcher.vertexCount}'),
+                      const SizedBox(height: 6),
+                      Text(
+                        'frame avg  ${_avgMs.toStringAsFixed(2)} ms',
+                        style: TextStyle(
+                          color: _avgMs < 17
+                              ? m.Colors.greenAccent
+                              : m.Colors.orangeAccent,
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                        ),
                       ),
-                    ),
-                    Text('frame p95  ${_p95Ms.toStringAsFixed(2)} ms'),
-                    Text('frame max  ${_worstMs.toStringAsFixed(2)} ms'),
-                    Text('samples    ${_frameMs.length}'),
-                  ],
-                ),
+                      Text('frame p95  ${_p95Ms.toStringAsFixed(2)} ms'),
+                      Text('frame max  ${_worstMs.toStringAsFixed(2)} ms'),
+                      Text('samples    ${_frameMs.length}'),
+                      Text(
+                        _usingGlb ? 'core: BLENDER GLB' : 'core: placeholder',
+                        style: TextStyle(
+                          color: _usingGlb
+                              ? const Color(0xFF5BFF9E)
+                              : const Color(0xFFFF6B6B),
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -872,11 +927,7 @@ class _ScenePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (!ready()) return;
-    scene.render(
-      cameraFor(),
-      canvas,
-      viewport: Offset.zero & size,
-    );
+    scene.render(cameraFor(), canvas, viewport: Offset.zero & size);
   }
 
   @override

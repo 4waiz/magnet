@@ -9,6 +9,13 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Vendored upstream dependency — see third_party/README.md. Its own test
+    # suite needs dev_dependencies we do not install, and we do not lint code
+    # we did not write. Our two patches are marked MAGNET RUSH LOCAL PATCH.
+    - third_party/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

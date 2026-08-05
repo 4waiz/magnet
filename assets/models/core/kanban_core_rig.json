@@ -1,0 +1,148 @@
+{
+  "unit": "metre",
+  "collision_proxy": {
+    "type": "sphere",
+    "radius": 0.5,
+    "centre": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "orbit_layers": [
+    {
+      "name": "inner_fast",
+      "radius": 1.02,
+      "height": 0.0,
+      "speed": 2.55,
+      "slots": 14,
+      "tilt": 0.1
+    },
+    {
+      "name": "mid_armour",
+      "radius": 1.46,
+      "height": 0.08,
+      "speed": -1.7,
+      "slots": 20,
+      "tilt": 0.42
+    },
+    {
+      "name": "outer_scrap",
+      "radius": 1.96,
+      "height": -0.06,
+      "speed": 1.15,
+      "slots": 28,
+      "tilt": 0.78
+    }
+  ],
+  "special_slots": {
+    "magnetic_key": {
+      "radius": 1.24,
+      "height": 0.34,
+      "speed": 1.9
+    }
+  },
+  "trail_points": [
+    [
+      0.0,
+      0.0,
+      -0.34
+    ],
+    [
+      0.3,
+      -0.1,
+      -0.22
+    ],
+    [
+      -0.3,
+      -0.1,
+      -0.22
+    ]
+  ],
+  "field_line_anchors": [
+    [
+      0.0,
+      0.52,
+      0.0
+    ],
+    [
+      0.0,
+      -0.52,
+      0.0
+    ],
+    [
+      0.46,
+      0.16,
+      0.16
+    ],
+    [
+      -0.46,
+      0.16,
+      0.16
+    ],
+    [
+      0.46,
+      -0.16,
+      -0.16
+    ],
+    [
+      -0.46,
+      -0.16,
+      -0.16
+    ],
+    [
+      0.0,
+      0.2,
+      0.5
+    ],
+    [
+      0.0,
+      -0.2,
+      -0.5
+    ]
+  ],
+  "seam": {
+    "gap": 0.15,
+    "z": 0.045,
+    "max_open": 0.39
+  },
+  "ring_axes": {
+    "inner": [
+      0.14,
+      0.06
+    ],
+    "mid": [
+      1.02,
+      0.34
+    ],
+    "outer": [
+      0.52,
+      -1.18
+    ]
+  },
+  "ring_speeds": {
+    "inner": 1.35,
+    "mid": -0.95,
+    "outer": 0.62
+  },
+  "fragment_orbits": [
+    {
+      "radius": 0.74,
+      "height": 0.2,
+      "speed": 0.85,
+      "phase": 0.0
+    },
+    {
+      "radius": 0.82,
+      "height": -0.14,
+      "speed": -0.62,
+      "phase": 2.1
+    },
+    {
+      "radius": 0.68,
+      "height": 0.3,
+      "speed": 0.48,
+      "phase": 4.2
+    }
+  ]
+}

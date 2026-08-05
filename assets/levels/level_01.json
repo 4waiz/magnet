@@ -1,0 +1,206 @@
+{
+  "id": "w1_l01",
+  "world": 1,
+  "index": 1,
+  "name": "MAGNETIC RESEARCH PLATFORM",
+  "coreStart": [0.0, 0.95, 0.0],
+  "coreSpeed": 4.6,
+  "finishZ": 71.0,
+  "swarmCapacity": 120,
+  "swarmStages": [12, 28, 48],
+
+  "route": [
+    [0.0, 0.0, -4.0],
+    [0.0, 0.0, 10.0],
+    [-1.4, 0.0, 20.0],
+    [-0.6, 0.0, 30.0],
+    [1.2, 0.0, 40.0],
+    [0.4, 0.0, 50.0],
+    [0.0, 0.0, 60.0],
+    [0.0, 0.0, 72.0],
+    [0.0, 0.0, 80.0]
+  ],
+
+  "platforms": [
+    { "asset": "assets/models/platforms/platform_wide.glb", "position": [0.0, 0.0, 3.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [0.0, 0.0, 9.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [-1.2, 0.0, 15.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [-1.4, 0.0, 21.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [-0.6, 0.0, 27.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [0.4, 0.0, 33.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [1.2, 0.0, 39.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [0.8, 0.0, 45.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [0.0, 0.0, 59.0] },
+    { "asset": "assets/models/platforms/platform_straight.glb", "position": [0.0, 0.0, 65.0] },
+    { "asset": "assets/models/platforms/platform_portal.glb", "position": [0.0, 0.0, 71.0] },
+
+    { "asset": "assets/models/platforms/platform_ledge.glb", "position": [-4.6, 0.9, 13.0] },
+    { "asset": "assets/models/platforms/platform_ledge.glb", "position": [4.8, 0.6, 35.0] },
+    { "asset": "assets/models/platforms/platform_lab_base.glb", "position": [-6.4, 1.5, 21.0] },
+
+    { "asset": "assets/models/platforms/platform_bridge_anchor.glb", "position": [0.0, 0.0, 47.4] },
+    { "asset": "assets/models/platforms/platform_bridge_anchor.glb", "position": [0.0, 0.0, 56.6] },
+
+    { "asset": "assets/models/platforms/prop_machinery_socket.glb", "position": [1.5, 0.0, 6.5], "decorative": true },
+    { "asset": "assets/models/platforms/prop_machinery_socket.glb", "position": [-1.6, 0.0, 30.5], "decorative": true },
+    { "asset": "assets/models/platforms/prop_cable_support.glb", "position": [0.0, 0.0, 17.0], "decorative": true },
+    { "asset": "assets/models/platforms/prop_cable_support.glb", "position": [0.6, 0.0, 43.0], "decorative": true },
+
+    { "asset": "assets/models/platforms/prop_tower.glb", "position": [-8.5, -3.5, 12.0], "scale": 1.4, "decorative": true },
+    { "asset": "assets/models/platforms/prop_tower.glb", "position": [9.2, -4.5, 24.0], "scale": 1.8, "decorative": true },
+    { "asset": "assets/models/platforms/prop_tower.glb", "position": [-10.0, -5.0, 38.0], "scale": 2.1, "decorative": true },
+    { "asset": "assets/models/platforms/prop_tower.glb", "position": [8.8, -3.0, 54.0], "scale": 1.5, "decorative": true },
+    { "asset": "assets/models/platforms/prop_tower.glb", "position": [-7.5, -2.5, 66.0], "scale": 1.3, "decorative": true },
+
+    { "asset": "assets/models/platforms/prop_backdrop_0.glb", "position": [-18.0, -9.0, 22.0], "scale": 2.4, "decorative": true },
+    { "asset": "assets/models/platforms/prop_backdrop_1.glb", "position": [20.0, -11.0, 40.0], "scale": 2.8, "decorative": true },
+    { "asset": "assets/models/platforms/prop_backdrop_2.glb", "position": [-22.0, -12.0, 58.0], "scale": 3.0, "decorative": true }
+  ],
+
+  "metalGroups": [
+    {
+      "id": "intro_scrap",
+      "centre": [0.0, 1.15, 9.0],
+      "count": 16,
+      "spread": [2.6, 0.7, 3.4],
+      "massClass": "light",
+      "stage": 1,
+      "templates": [
+        "assets/models/metal/metal_cube_small.glb",
+        "assets/models/metal/metal_bolt.glb",
+        "assets/models/metal/metal_nut.glb",
+        "assets/models/metal/metal_scrap_triangle.glb"
+      ]
+    },
+    {
+      "id": "ledge_cache",
+      "centre": [-4.6, 2.0, 13.0],
+      "count": 10,
+      "spread": [1.0, 0.5, 1.9],
+      "massClass": "light",
+      "stage": 1,
+      "templates": [
+        "assets/models/metal/metal_cube_small.glb",
+        "assets/models/metal/metal_ring.glb",
+        "assets/models/metal/metal_nut.glb"
+      ]
+    },
+    {
+      "id": "lab_machinery",
+      "centre": [-6.4, 2.9, 21.0],
+      "count": 16,
+      "spread": [2.4, 0.8, 2.8],
+      "massClass": "medium",
+      "stage": 2,
+      "templates": [
+        "assets/models/metal/metal_gear_small.glb",
+        "assets/models/metal/metal_gear_large.glb",
+        "assets/models/metal/metal_plate.glb",
+        "assets/models/metal/metal_cube_medium.glb"
+      ]
+    },
+    {
+      "id": "heavy_stock",
+      "centre": [-0.6, 1.25, 24.5],
+      "count": 12,
+      "spread": [2.2, 0.6, 1.6],
+      "massClass": "heavy",
+      "stage": 3,
+      "templates": [
+        "assets/models/metal/metal_rod.glb",
+        "assets/models/metal/metal_pipe_piece.glb",
+        "assets/models/metal/metal_scrap_block.glb",
+        "assets/models/metal/metal_scrap_curved.glb"
+      ]
+    },
+    {
+      "id": "post_wall_debris",
+      "centre": [1.2, 1.2, 39.0],
+      "count": 10,
+      "spread": [2.4, 0.7, 2.6],
+      "massClass": "medium",
+      "stage": 3,
+      "templates": [
+        "assets/models/metal/metal_scrap_block.glb",
+        "assets/models/metal/metal_plate.glb",
+        "assets/models/metal/metal_cube_medium.glb"
+      ]
+    }
+  ],
+
+  "wall": {
+    "centre": [-0.6, 0.0, 27.5],
+    "columns": 5,
+    "rows": 3,
+    "blockSize": 0.92,
+    "hitsPerBlock": 1
+  },
+
+  "armour": {
+    "centre": [0.4, 1.35, 33.0],
+    "count": 8,
+    "spread": [2.2, 0.5, 1.8],
+    "absorbs": 1,
+    "templates": [
+      "assets/models/metal/armour_plate.glb",
+      "assets/models/metal/armour_spike.glb"
+    ]
+  },
+
+  "hazards": [
+    {
+      "id": "lab_discharge",
+      "position": [4.8, 1.1, 40.5],
+      "triggerZ": 34.5,
+      "telegraphSeconds": 1.5,
+      "damage": 1
+    }
+  ],
+
+  "bridge": {
+    "pieceCount": 8,
+    "piecesRequired": 6,
+    "pieceCentre": [0.8, 1.25, 45.0],
+    "pieceSpread": [2.2, 0.5, 2.0],
+    "anchors": [[0.0, 0.0, 47.4], [0.0, 0.0, 56.6]],
+    "spanFrom": [0.0, 0.0, 47.6],
+    "spanTo": [0.0, 0.0, 56.4],
+    "templates": [
+      "assets/models/metal/bridge_segment.glb",
+      "assets/models/metal/bridge_beam.glb"
+    ]
+  },
+
+  "gap": { "startZ": 48.0, "endZ": 56.0 },
+
+  "key": {
+    "position": [0.0, 1.45, 62.4],
+    "asset": "assets/models/metal/magnetic_key.glb",
+    "barsAsset": "assets/models/obstacles/obstacle_key_chamber.glb",
+    "barsPosition": [0.0, 0.0, 61.6],
+    "barGapWidth": 0.42
+  },
+
+  "portal": {
+    "position": [0.0, 0.0, 71.0],
+    "asset": "assets/models/obstacles/obstacle_finish_portal.glb",
+    "discAsset": "assets/models/obstacles/obstacle_portal_disc.glb",
+    "locked": true,
+    "requiresKey": true
+  },
+
+  "cameraZones": [
+    { "startZ": -10.0, "endZ": 20.0, "distance": 10.6, "height": 6.2, "fovDegrees": 45, "lookAhead": 2.6, "lateral": 0.45 },
+    { "startZ": 20.0, "endZ": 30.5, "distance": 9.4,  "height": 5.6, "fovDegrees": 43, "lookAhead": 2.0, "lateral": 0.35 },
+    { "startZ": 30.5, "endZ": 44.0, "distance": 10.8, "height": 6.4, "fovDegrees": 46, "lookAhead": 2.8, "lateral": 0.5 },
+    { "startZ": 44.0, "endZ": 57.5, "distance": 12.6, "height": 7.6, "fovDegrees": 49, "lookAhead": 3.4, "lateral": 0.55 },
+    { "startZ": 57.5, "endZ": 67.0, "distance": 9.8,  "height": 5.8, "fovDegrees": 43, "lookAhead": 3.0, "lateral": 0.3 },
+    { "startZ": 67.0, "endZ": 90.0, "distance": 11.4, "height": 6.8, "fovDegrees": 47, "lookAhead": 2.2, "lateral": 0.25 }
+  ],
+
+  "objectives": [
+    { "id": "collect_40", "description": "Collect 40 pieces of metal", "target": 40 },
+    { "id": "perfect_2", "description": "Land 2 perfect releases", "target": 2 },
+    { "id": "no_damage", "description": "Finish without taking damage", "target": 1 }
+  ]
+}

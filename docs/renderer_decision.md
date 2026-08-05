@@ -99,26 +99,71 @@ Physics is likewise custom and minimal: attraction is a clamped inverse-range
 impulse, projectiles are ballistic, and collisions are radius tests. Nothing
 needs a general solver, and avoiding one keeps resets exact.
 
+## Getting Blender geometry into the batch
+
+The batcher needs triangles **on the CPU**. `flutter_scene` imports GLB straight
+onto the GPU, which is right for static scenery and useless for a mesh that is
+rebuilt every frame. Without a CPU path the swarm could only stamp shapes
+hand-coded in Dart — which is exactly how the first pass ended up as a hundred
+identical cubes.
+
+`lib/game/renderer/glb_template_loader.dart` parses GLB in Dart into
+`MeshTemplate` (positions, per-face normals, indices, and per-vertex colours
+baked from each primitive's `baseColorFactor`). Scope is deliberately narrow —
+triangle primitives, float POSITION, non-sparse accessors, no Draco — i.e. what
+`art/blender/*.py` actually exports. Anything else throws with a clear message
+rather than producing silently wrong geometry.
+
+Consequence: the swarm stamps **real Blender-authored silhouettes** — bolts,
+nuts, gears, rods, plates, rings, scrap, armour, bridge beams, the key — and
+still costs one draw call. Multi-material meshes survive the merge because each
+primitive's colour is baked per vertex. Covered by
+`test/glb_template_loader_test.dart`.
+
+## Two batches, not one
+
+* **Metal batch** — `PhysicallyBasedMaterial`, lit, opaque. Swarm, wall blocks,
+  heavy debris.
+* **Glow batch** — a `GlowMaterial` subclass of `UnlitMaterial` that overrides
+  `isOpaque()` to return `false`. Trails, shockwave rings and sparks.
+
+That override matters: stock `UnlitMaterial` does not override `isOpaque`, so
+unlit geometry always lands in the opaque pass and its alpha is ignored.
+Overriding moves those draws into the depth-sorted translucent pass, which is
+what makes effects read as light rather than as solid plastic.
+
+## Camera field of view on a portrait phone
+
+`PerspectiveCamera` takes a **vertical** FOV and derives horizontal as
+`tan(fovY/2) * aspect`. On a 1080×2400 phone the aspect is 0.45, so an
+apparently reasonable 45° vertical FOV gives barely 21° horizontally — the first
+playable build framed a 4 m lane as if it were two metres across, and the
+platforms filled the entire screen width.
+
+Level data therefore authors the **horizontal** angle, and
+`GameCamera.verticalFovFor` solves for vertical against the live viewport
+aspect, clamped to 35–78° (past ~78° the edge distortion becomes obvious).
+Covered by `test/camera_test.dart`.
+
 ## Measured results
 
-Android emulator (`emu64xa`, Android 16, x86_64), portrait 1080×2400,
-100 collectible objects + 28-block breakable wall, 128 batched objects total
-(1,536 triangles) in **one draw call**.
+See `docs/performance_report.md` for the full table. Summary, on the Android
+emulator only:
 
-| Build | Backend | avg | p95 | max |
-|---|---|---|---|---|
-| Debug | Vulkan | 10.88 ms | 16.35 ms | 26.53 ms |
-| Release | GLES 3.0 | 23.52 ms | 37.48 ms | 68.75 ms |
+| Build | Backend | Swarm | avg | p95 |
+|---|---|---:|---:|---:|
+| Release | Impeller GLES 3.0 | 0–27 | 19.4–22.0 ms | 24.4–26.5 ms |
+| Debug | Impeller Vulkan | 28–41 | 27.6–44.6 ms | 46.9–83.9 ms |
 
-Verified interactively on device: hold-to-attract captured 94 objects, 81 held
-in simultaneous controlled orbit, release launched the swarm, and 5 wall blocks
-were destroyed by the launched projectiles.
+Draw calls, counted from the scene graph: ~26 for the environment (one node per
+placement, sharing cached meshes), 11 for the Core's animated parts, **1** for
+the entire swarm and **1** for every particle, trail and shockwave.
 
 **Caveat, stated plainly:** these are emulator numbers. The emulator's GLES path
-is software-rasterised and is the pessimistic bound, not a phone measurement.
-The Vulkan figure is the more representative one, and real hardware should beat
-both. No physical Android device was attached to this machine, so a
-hardware-measured figure is still outstanding — see `docs/known_limitations.md`.
+is software-rasterised and is the pessimistic bound, not a phone measurement. No
+physical Android device was attached to this machine, so a hardware-measured
+figure is still outstanding, and **60 FPS is not demonstrated on real hardware.**
+Swarms of 100 and 150 objects were never measured at all.
 
 ## Consequences
 
@@ -129,3 +174,6 @@ hardware-measured figure is still outstanding — see `docs/known_limitations.md
 * Minimum practical target is OpenGL ES 3.0.
 * Every gameplay object must be expressible as a low-poly template plus a
   transform, so it can enter the batch.
+* Batched geometry is indexed with 16-bit indices, so a single template cannot
+  exceed 21,845 triangles. The loader rejects anything larger rather than
+  overflowing.

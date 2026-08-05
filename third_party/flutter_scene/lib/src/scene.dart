@@ -128,6 +128,19 @@ base class Scene implements SceneGraph {
     return _antiAliasingMode;
   }
 
+  /// MAGNET RUSH PATCH: exposes the Flutter GPU context's capability fingerprint.
+  ///
+  /// Needed to tell the Impeller Vulkan and GLES backends apart from Dart.
+  /// They composite the offscreen scene texture with opposite vertical
+  /// orientation, and nothing else in the public API distinguishes them.
+  Map<String, Object> get debugGpuFingerprint => {
+    'msaa': gpu.gpuContext.doesSupportOffscreenMSAA,
+    'color': gpu.gpuContext.defaultColorFormat.toString(),
+    'stencil': gpu.gpuContext.defaultStencilFormat.toString(),
+    'depthStencil': gpu.gpuContext.defaultDepthStencilFormat.toString(),
+    'uniformAlign': gpu.gpuContext.minimumUniformByteAlignment,
+  };
+
   /// Prepares the rendering resources, such as textures and shaders,
   /// that are used to display models in this [Scene].
   ///

@@ -38,6 +38,14 @@ dependencies:
     path: third_party/flutter_scene
   vector_math: ^2.2.0
 
+  # Audio. The SFX bank is synthesized as PCM in Dart at boot and played from
+  # memory (see lib/core/audio/) — no third-party samples, so there is nothing
+  # to license and nothing to ship.
+  audioplayers: ^6.1.0
+
+  # Settings and progress persistence.
+  shared_preferences: ^2.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -67,6 +75,8 @@ flutter:
     - assets/models/metal/
     - assets/models/platforms/
     - assets/models/obstacles/
+    - assets/levels/
+    - assets/branding/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

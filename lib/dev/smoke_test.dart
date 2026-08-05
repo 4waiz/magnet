@@ -510,7 +510,12 @@ class _SmokeTestPageState extends State<SmokeTestPage>
   Future<void> _boot() async {
     await Scene.initializeStaticResources();
     try {
-      final glb = await Node.fromGlbAsset('assets/models/core/kanban_core.glb');
+      // The single welded `kanban_core.glb` was retired when the Core was
+      // rebuilt as separable animated parts; the harness only needs one GLB to
+      // prove the import path, so it loads the shell cap.
+      final glb = await Node.fromGlbAsset(
+        'assets/models/core/core_shell_upper.glb',
+      );
       _scene.remove(_coreNode);
       _coreNode = glb;
       _scene.add(_coreNode);

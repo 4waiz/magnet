@@ -121,8 +121,8 @@ reproduces the same swarm trajectory to 1e-12.
 
 | Artefact | Size |
 |---|---|
-| `app-release.apk` | 44.4 MB |
-| `app-release.aab` | 44.7 MB |
+| `app-release.apk` | 44.8 MB |
+| `app-release.aab` | 45.2 MB |
 | `app-debug.apk` | 178 MB |
 | All 80 GLB assets combined | 886 kB |
 

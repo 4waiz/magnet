@@ -63,7 +63,7 @@ run has not yet failed on purpose.
   and unit-tested for them; the frame cost at those counts is unknown.
 * Peak and post-retry memory were not captured — the measurement script's
   readings were lost to a scripting mistake, and guesses are not reported.
-* Release APK is 44.4 MB. That is engine plus four ABIs, not art (all 80 GLBs
+* Release APK is 44.8 MB. That is engine plus four ABIs, not art (all 80 GLBs
   total 886 kB). `--split-per-abi` is untried.
 
 ## Not built

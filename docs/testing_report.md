@@ -9,13 +9,13 @@
 
 | Check | Result |
 |---|---|
-| `dart format .` | 192 files formatted, clean |
+| `dart format .` | 194 files formatted, clean |
 | `flutter analyze` | **No issues found** |
 | `flutter test` | **91 tests, all passing** |
 | `flutter build apk --debug` | ✅ built |
-| `flutter build apk --release` | ✅ built, 44.4 MB |
-| `flutter build appbundle --release` | ✅ built, 44.7 MB |
-| Release APK launches on device | ✅ Impeller GLES, no crash |
+| `flutter build apk --release` | ✅ built, 44.8 MB |
+| `flutter build appbundle --release` | ✅ built, 45.2 MB |
+| Release APK launches on device | ✅ Impeller GLES, no crash, correct orientation |
 | Debug APK launches on device | ✅ Impeller Vulkan, no crash |
 
 ## Test inventory
@@ -79,12 +79,12 @@ so a level referencing a deleted GLB fails the suite.
 * with no landing predicate supplied, nothing lands
 * a piece only lands while descending
 
-### `test/widget_test.dart` — 6 tests
+### `test/widget_test.dart` — 5 tests
 * home renders the Magnet Rush shell and **is not a MaterialApp**
 * settings toggles write through to the store; quality presets change the cap
 * settings open from home
 * button fires once per tap
-* cyan and orange stay far apart in hue (gameplay colour language)
+* the in-world safe/hazard colours stay far apart in hue
 
 ## Bugs found by testing or on-device verification, and fixed
 
@@ -99,6 +99,10 @@ so a level referencing a deleted GLB fails the suite.
 | Camera aim drifted permanently with every impact | Reasoning about the shake code after seeing skewed framing | Shake applied to the outgoing camera only, never folded into smoothed state. Regression test added. |
 | Launched metal that missed was destroyed forever, so a player could run out at the wall with no way to continue | Scripted playthrough getting stuck | Metal landing over solid deck becomes collectable again; plus a soft-lock guard that fails the run with a clear reason. Regression tests added. |
 | Wall blocks rendered at 48% of their grid spacing — a sparse lattice, not a wall | On-device diagnostic (`wallAlive=16/28`) | Blocks fill their cell; hit radius widened against tunnelling |
+| Most launched metal flew *over* the wall — orbits spread ~2 m up, the wall topped out at 1.66 m | On-device diagnostic across three wall revisions | 5x3 blocks of 0.92 m, top at 2.18 m. Wall now clears in 1-2 releases |
+| **The 3D scene rendered upside down on Impeller GLES** | Capturing identical game state on both backends | Canvas flip at composite, with a documented heuristic and `MR_FLIP_Y` override. See `docs/known_limitations.md` |
+| `MrButton` overflowed with a long label in a narrow button (the quality presets on a 360 pt screen) | `flutter test` layout assertion | Label is `Flexible` with ellipsis |
+| The home menu clipped its lower half on short viewports | Same | Menu is scrollable; `Spacer`/`Flexible` replaced with fixed spacing |
 
 ## What is *not* covered by automated tests
 

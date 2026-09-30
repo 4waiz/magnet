@@ -109,7 +109,7 @@ class _MrButtonState extends State<MrButton>
                   colour: Color.lerp(base, pressed, t)!,
                   radius: widget.compact ? MrRadius.sm : MrRadius.md,
                   padding: EdgeInsets.symmetric(
-                    horizontal: widget.compact ? MrSpace.md : MrSpace.lg,
+                    horizontal: widget.compact ? MrSpace.sm : MrSpace.lg,
                     vertical: widget.compact ? 10 : 16,
                   ),
                   child: Row(
@@ -120,12 +120,19 @@ class _MrButtonState extends State<MrButton>
                         widget.icon!,
                         const SizedBox(width: MrSpace.sm),
                       ],
-                      Text(
-                        widget.label,
-                        textAlign: TextAlign.center,
-                        style: widget.compact
-                            ? MrType.button.copyWith(fontSize: 14)
-                            : MrType.button,
+                      // Flexible so a long label in a narrow button (the three
+                      // quality presets share a row on a 360 pt screen) shrinks
+                      // instead of overflowing.
+                      Flexible(
+                        child: Text(
+                          widget.label,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: widget.compact
+                              ? MrType.button.copyWith(fontSize: 14)
+                              : MrType.button,
+                        ),
                       ),
                     ],
                   ),
